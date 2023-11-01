@@ -223,5 +223,165 @@ album.xml 파일에 복사
 → 위 패키지도 앨범패키지가된다.
 
 
+## 컨트롤러 생성
+
+album.controller 패키지
+
+→ 아까 컨트롤러가 album에 있다고 작성해놨었음.
+
+![Untitled](https://github.com/dongjun-Lim96/Spring_MyBatis_ex1/assets/121374440/f4c9c03e-cc9e-4875-9c12-584798f8cd94)
+
+AlbumListController.java
+
+@Controller
+
+public class AlbumListController {
+	
+	private String command = "/list.ab";
+	private String getPage = "albumList";
+	
+	@RequestMapping(value=command)
+	public String doAction() {
+		
+		
+		return getPage; // /WEB-INF/album/albumList.jsp -> 폴더랑 파일둘다 생성
+	}
+}
+
+→ The value for annotation attribute RequestMapping.value must be a constant expression
+
+에러가 뜸. RequestMapping.value는 **반드시 상수**여야 하므로  아래처럼 수정
+
+그리고
+
+앨범 파일과 jsp 파일 생성해쥼
+
+![Untitled (1)](https://github.com/dongjun-Lim96/Spring_MyBatis_ex1/assets/121374440/af4b106d-330c-49b2-8be2-7608fa2a3841)
+
+### model 생성
+
+![Untitled (2)](https://github.com/dongjun-Lim96/Spring_MyBatis_ex1/assets/121374440/abb94cd8-648c-4150-8773-1fa254e9561f)
+
+AlbumBean.java
+
+
+public class AlbumBean {
+
+	private int num;
+ 
+	private String title;
+ 
+	private String singer;
+ 
+	private String price; // 유효성검사를 할건데, 유효성검사할때는 반드시 String 이어야한다!!
+ 
+	private String day;
+	
+	setter, getter, 생성자 생략함
+}
+
+- 유효성검사를 할건데, 유효성검사할때는 반드시 String 이어야한다!!
+- 그동안은 bean의 이름과 컬럼이름이 달라도 되었지만 mybatis를 사용하기 위해서는 반드시 똑같아야한다.
+
+
+AlbumDao.java
+
+// AlbumDao myAlbumDao = new AlbumDao();
+
+@Component("myAlbumDao")
+
+public class AlbumDao {
+	
+	// mapper화일, 즉 album.xml; 에 있는 namespace 속성의 값 album.AlbumBean 똑같이 작성
+	private String namespace = "album.AlbumBean";
+	
+	// root-context.xml의 맨 마지막에 보면 SqlSessionTemplate 객체를 생성했었다.
+	// 따라서 여기서 새로 생성하는 것이 아닌, 아까 만든 객체를 여기에 주입해야한다. - @Autowired 어노테이션 사용함
+	@Autowired
+	SqlSessionTemplate sqlSessionTemplate;
+	
+	public AlbumDao() {
+		System.out.println("AlbumDao()");
+	}
+	
+	
+	// 
+	public List<AlbumBean> getAlbumList(){
+		
+		List<AlbumBean> lists = new ArrayList<AlbumBean>();
+		lists = sqlSessionTemplate.selectList(namespace + ".GetAlbumList"); // select 에서 ArrayList 로 가져오는 메서드
+		System.out.println("lists.size() : " + lists.size());
+		return lists;
+	}
+}
+
+- 객체생성하는 @Component 어노테이션 작성함
+- album.xml; 에 있는 namespace 속성의 값 album.AlbumBean 똑같이 작성
+- root-context.xml의 맨 마지막에 보면 SqlSessionTemplate 객체를 생성했었는데 해당 객체를 주입한다
+
+
+
+### 다시 mapper 화일로 , ,
+!
+	아까 다오에서 작성했던 GetAlbumList id에 복붙 ㄱㄱ 
+	만들객체는 resultType 에
+	
+	select 태그안에서 select 작업을한다.
+	주의할점!!! ; 세미콜론 절대 작성 ㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴ
+
+<!-- mapper의 공간 이름은 album.AlbumBean 이며, -->
+<mapper namespace="album.AlbumBean">
+
+	<!-- id가 GetAlbumList 이다. -->
+	<!-- album.model 의 AlbumBean 클래스. 이건 아무거나쓰면 안되고 파일대로 맞춰주어야 한다! -->
+	<select id="GetAlbumList" resultType="album.model.AlbumBean">
+		select * from albums
+		order by num desc
+	
+	</select>
+</mapper>
+
+<!-- 
+상관 ㄴㄴ a.b.c 도 가넝
+AlbumBean 객체로 만들고
+-> resultType="album.model.AlbumBean"
+
+알아서 ArrayList로 넣는다.
+ -->
+
+
+### ~ 흐름정리~
+목록보기 (추가하기 클릭 ) 
+
+→ insert.ab GET방식 요청 
+
+→ AlbumInsertController.java 
+
+→ albumInsertForm.jsp 
+
+→ 항목입력 후 추가하기 클릭 
+
+→ insert.ab POST방식 요청 
+
+→ AlbumInsertController.java 
+
+→ 객체의 유효성검사에 따른 (hasError) 결과 처리
+
+→ 올바르게 객체가 생성되면 해당 객체를 가지고 다오클래스의 insert 메서드를 호출한다
+
+→ AlbumDao  커맨드 객체가 넘어온다.
+
+→ insertAlbum 메서드안에 album 객체가 들어옴
+
+→ sqlSessionTemplate.insert 의 네임스페이스와 id
+
+→ album.xml 파일에 따라 sql 처리 후 돌아감
+
+→ 다오 메서드 return cnt;
+
+→ 컨트롤러 cnt로 옴
+
+
+
 
 
