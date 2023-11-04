@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- album.xml -->
+<!-- mapper 화일이라고 한다. -->
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+
+<!-- 
+	아까 다오에서 작성했던 GetAlbumList id에 복붙 ㄱㄱ 
+	만들객체는 resultType 에
+	
+	select 태그안에서 select 작업을한다.
+	주의할점!!! ; 세미콜론 절대 작성 ㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴ
+-->
+
+<!-- mapper의 공간 이름은 album.AlbumBean 이며, -->
+<mapper namespace="album.AlbumBean">
+	
+</mapper>
+
+<!-- 
+<mapper namespace="album.AlbumBean"
+상관 ㄴㄴ a.b.c 도 가넝
+
+AlbumBean 객체로 만들고
+-> resultType="album.model.AlbumBean"
+
+알아서 ArrayList로 넣는다.
+ -->
